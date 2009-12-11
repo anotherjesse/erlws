@@ -5,7 +5,7 @@
 start() ->
     Pid = spawn(fun() -> manage_clients([]) end),
     register(client_manager, Pid),
-    {ok, Listen} = gen_tcp:listen(1234, [{packet,0},
+    {ok, Listen} = gen_tcp:listen(8989, [{packet,0},
                                          {reuseaddr,true},
                                          {active, true}]),
     spawn(fun() -> par_connect(Listen) end).
