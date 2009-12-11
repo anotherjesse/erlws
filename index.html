@@ -1,0 +1,23 @@
+<body>
+  <script>
+    function send(text) {
+      ws.send(text);
+    }
+    if ("WebSocket" in window) {
+      ws = new WebSocket("ws://localhost:1234");
+      ws.onopen = function() {
+        document.getElementById('stuff').innerText = "welcome";
+      };
+      ws.onmessage = function(evt) {
+        document.getElementById('stuff').innerText += "\n" + evt.data;
+      };
+      ws.onclose = function() {
+        document.getElementById('stuff').innerText += "\nbye bye";
+      };
+    } else {
+      alert("sad");
+    };
+  </script>
+  <pre id="stuff"></pre>
+  <input type="text" onchange="send(this.value); this.value = ''" />
+</body>
