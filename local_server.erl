@@ -20,10 +20,12 @@ par_connect(Listen) ->
 
 wait(Socket) ->
     receive
-        {tcp, Socket, _} ->
+        {tcp, Socket, Data} ->
+            {match, [{Start, Length}]} = re:run(Data, "Origin: [^\r]*"),
+            Origin = string:substr(Data, Start+9, Length-8),
             Msg = prefix() ++
-                "WebSocket-Origin: http://localhost\r\n" ++
-                "WebSocket-Location: ws://localhost:1234/\r\n\r\n",
+                "WebSocket-Origin: " ++ Origin ++ "\r\n" ++
+                "WebSocket-Location: ws://userscripts.org:8989/\r\n\r\n",
             gen_tcp:send(Socket, Msg),
             loop(Socket);
         Any ->
