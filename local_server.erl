@@ -41,7 +41,7 @@ loop(Socket) ->
         {tcp, Socket, Data} ->
             Data1 = unframe(Data),
             io:format("data: ~p~n",[Data1]),
-            client_manager ! {data, Data1},
+            client_manager ! {data, Socket, Data1},
             loop(Socket);
         {tcp_closed, Socket} ->
             client_manager ! {disconnect, Socket};
@@ -64,15 +64,15 @@ manage_clients(Sockets) ->
         {disconnect, Socket} ->
             io:format("Socket disconnected: ~w~n", [Socket]),
             NewSockets = lists:delete(Socket, Sockets);
-        {data, Data} ->
-            send_data(Sockets, Data),
+        {data, User, Data} ->
+            send_data(Sockets, User, Data),
             NewSockets = Sockets
     end,
     manage_clients(NewSockets).
 
 
-send_data(Sockets, Data) ->
+send_data(Sockets, User, Data) ->
     SendData = fun(Socket) ->
-                       gen_tcp:send(Socket, [0] ++ "echo: " ++ Data ++ [255])
+                       gen_tcp:send(Socket, [0] ++ io_lib:format("~p", [User]) ++ ": " ++ Data ++ [255])
                end,
     lists:foreach(SendData, Sockets).
